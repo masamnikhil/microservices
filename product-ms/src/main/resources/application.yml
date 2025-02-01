@@ -1,0 +1,13 @@
+eureka:
+  instance:
+    hostname: MasamNikhil.mshome.net
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    feign: DEBUG
+    com.microservice.product_ms.client.ReviewClient: DEBUG
