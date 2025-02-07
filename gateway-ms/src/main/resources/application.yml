@@ -32,6 +32,13 @@ spring:
               args:
                 name: review-service
                 fallbackuri: forward:/reviewFallBack
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowedCredentials: true
 
 hystrix:
   command:
@@ -39,15 +46,14 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 10000
-=======
-            timeoutInMilliseconds: 20000
+            timeoutInMilliseconds: 2000
 
 ribbon:
   eureka:
     enabled: true
-  ConnectTimeout: 5000
-  ReadTimeout: 5000
+  ConnectTimeout: 10000
+  ReadTimeout: 10000
+  MaxAutoRetries: 2
 
 
 management:
@@ -56,20 +62,19 @@ management:
       exposure:
         include: hystrix.stream
 
-<<<<<<< HEAD
-=======
-#Eureka
->>>>>>> 6b6ee8c (sorting added)
 eureka:
   instance:
-    hostname: MasamNikhil.mshome.net
+    hostname: localhost
     prefer-ip-address: true
     ip-address: 127.0.0.1
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+  register-with-eureka: true
+  fetch-registry: true
+  registry-fetch-interval-seconds: 2
+  initial-instance-info-replication-interval-seconds: 2
 
-=======
 #resiliance
 resilience4j:
   circuitbreaker:
@@ -77,29 +82,33 @@ resilience4j:
       user-service:
         failureRateThreshold: 50
         slowCallRateThreshold: 50
-        slowCallDurationThreshold: 2000
+        slowCallDurationThreshold: 3000
         waitDurationInOpenState: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
-        minimumNumberOfCalls: 5
+        minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
       product-service:
         failureRateThreshold: 50
         slowCallRateThreshold: 50
-        slowCallDurationThreshold: 2000
+        slowCallDurationThreshold: 3000
         waitDurationInOpenState: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
-        minimumNumberOfCalls: 5
+        minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
       review-service:
         failureRateThreshold: 50
         slowCallRateThreshold: 50
-        slowCallDurationThreshold: 2000
+        slowCallDurationThreshold: 3000
         waitDurationInOpenState: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
-        minimumNumberOfCalls: 5
+        minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
+
+
+
+
 
 

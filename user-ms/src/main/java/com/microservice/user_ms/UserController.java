@@ -24,7 +24,7 @@ public class UserController {
         if(userService.createUser(user)){
             return ResponseEntity.status(HttpStatus.CREATED).body("You SignedUp Successfully");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username already exists");
+        return ResponseEntity.status(HttpStatus.FOUND).body("username already exists");
     }
 
     @PostMapping("/signin")
