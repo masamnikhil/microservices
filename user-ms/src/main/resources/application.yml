@@ -4,11 +4,12 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: MasamNikhil.mshome.net
     prefer-ip-address: true
     ip-address: 127.0.0.1
-    initial-instance-info-replication-interval-seconds: 2
+    leaseRenewalIntervalInSeconds: 3
   client:
+    initialInstanceInfoReplicationIntervalSeconds: 1
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
@@ -16,4 +17,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
+  health:
+    circuitbreakers:
+      enabled: true

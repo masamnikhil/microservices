@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 @Data
 @Table(name = "users")
-class User implements UserDetails{
+class User extends UserAuditing implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

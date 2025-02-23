@@ -8,6 +8,15 @@ spring:
             - Path=/user/**
           filters:
             - CustomFilter
+            - name: Retry
+              args:
+                retries: 3
+                statuses:
+                  - INTERNAL_SERVER_ERROR
+                  - SERVICE_UNAVAILABLE
+                backoff:
+                  firstBackoff: 5000ms
+                timeout: 60000
             - name: CircuitBreaker
               args:
                 name: user-service
@@ -46,34 +55,33 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 2000
+            timeoutInMilliseconds: 5000
 
-ribbon:
-  eureka:
-    enabled: true
-  ConnectTimeout: 10000
-  ReadTimeout: 10000
-  MaxAutoRetries: 2
+#ribbon:
+#  eureka:
+#    enabled: true
+#  ServerListRefreshInterval: 5000
+#  NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule
+#  ConnectTimeout: 10000
+#  ReadTimeout: 10000
 
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: hystrix.stream
+
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: MasamNikhil.mshome.net
     prefer-ip-address: true
     ip-address: 127.0.0.1
+    leaseRenewalIntervalInSeconds: 3
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-  register-with-eureka: true
-  fetch-registry: true
-  registry-fetch-interval-seconds: 2
-  initial-instance-info-replication-interval-seconds: 2
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 1
+    initialInstanceInfoReplicationIntervalSeconds: 1
+
 
 #resiliance
 resilience4j:
@@ -81,32 +89,33 @@ resilience4j:
     instances:
       user-service:
         failureRateThreshold: 50
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 3000
-        waitDurationInOpenState: 5000
+        waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 10000
         slidingWindowSize: 10
-        minimumNumberOfCalls: 10
+        minimumNumberOfCalls: 1
+        slidingWindowType: COUNT_BASED
         automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
       product-service:
         failureRateThreshold: 50
+        waitDurationInOpenState: 5s
         slowCallRateThreshold: 50
-        slowCallDurationThreshold: 3000
-        waitDurationInOpenState: 5000
+        slowCallDurationThreshold: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
       review-service:
         failureRateThreshold: 50
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 3000
         waitDurationInOpenState: 5000
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
-
 
 
 
