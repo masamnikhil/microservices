@@ -1,17 +1,19 @@
 package com.microservice.user_ms;
 
 import com.microservice.user_ms.config.JWTService;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
+    @Retry(name = "user-service", fallbackMethod = "fallBackResponse")
     public boolean createUser(UserRequest user) {
         Optional<User> u = userRepository.findByUsername(user.getUsername());
         if(u.isPresent())
@@ -46,10 +49,13 @@ public class UserServiceImpl implements UserService{
         return true;
     }
 
+    private String fallBackResponse(Exception ex){
+        return ex.getMessage();
+    }
+
     @Override
     public String authenticate(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
-      //  user.get().getAuthorities();
         if(user.isEmpty())
             throw new RuntimeException();
 

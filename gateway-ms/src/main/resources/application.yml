@@ -8,15 +8,15 @@ spring:
             - Path=/user/**
           filters:
             - CustomFilter
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - INTERNAL_SERVER_ERROR
-                  - SERVICE_UNAVAILABLE
-                backoff:
-                  firstBackoff: 5000ms
-                timeout: 60000
+#            - name: Retry
+#              args:
+#                retries: 3
+#                statuses:
+#                  - INTERNAL_SERVER_ERROR
+#                  - SERVICE_UNAVAILABLE
+#                backoff:
+#                  firstBackoff: 5000ms
+#                timeout: 60000
             - name: CircuitBreaker
               args:
                 name: user-service
@@ -117,7 +117,11 @@ resilience4j:
         minimumNumberOfCalls: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
 
-
+resilience4j.retry:
+  instances:
+    user-service:
+      maxAttempts: 3
+      waitDuration: 1000ms
 
 
 
