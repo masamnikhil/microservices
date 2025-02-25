@@ -42,11 +42,11 @@ public class ProductController {
         }
     }
 
-<<<<<<< HEAD
+
     @PutMapping("/updateproduct")
-    private ResponseEntity<String> updateproduct(@PathVariable("id") Long id){
+    private ResponseEntity<String> updateproduct(@PathVariable("id") Long id) {
         return null;
-=======
+    }
     @GetMapping("/getproducts")
     private ResponseEntity<List<Product>> getAllProducts(@RequestParam(name = "order") String sortOrder,
                                                          @RequestParam(name = "price") String price,
@@ -57,6 +57,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.OK).body(productList);
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
->>>>>>> 6b6ee8c (sorting added)
+
     }
 }

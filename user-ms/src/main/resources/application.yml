@@ -21,3 +21,5 @@ management:
   health:
     circuitbreakers:
       enabled: true
+
+

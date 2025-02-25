@@ -8,15 +8,6 @@ spring:
             - Path=/user/**
           filters:
             - CustomFilter
-#            - name: Retry
-#              args:
-#                retries: 3
-#                statuses:
-#                  - INTERNAL_SERVER_ERROR
-#                  - SERVICE_UNAVAILABLE
-#                backoff:
-#                  firstBackoff: 5000ms
-#                timeout: 60000
             - name: CircuitBreaker
               args:
                 name: user-service
@@ -57,13 +48,6 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-#ribbon:
-#  eureka:
-#    enabled: true
-#  ServerListRefreshInterval: 5000
-#  NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule
-#  ConnectTimeout: 10000
-#  ReadTimeout: 10000
 
 
 
@@ -91,37 +75,71 @@ resilience4j:
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
-        slowCallRateThreshold: 100
-        slowCallDurationThreshold: 10000
         slidingWindowSize: 10
-        minimumNumberOfCalls: 1
+        minimumNumberOfCalls: 5
         slidingWindowType: COUNT_BASED
         automaticTransitionFromOpenToHalfOpenEnabled: true
         registerHealthIndicator: true
+
       product-service:
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
-        minimumNumberOfCalls: 10
+        minimumNumberOfCalls: 5
+        slidingWindowType: COUNT_BASED
         automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
+
       review-service:
         failureRateThreshold: 50
         waitDurationInOpenState: 5000
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 5000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
-        minimumNumberOfCalls: 10
+        minimumNumberOfCalls: 5
         automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
+     # time limiter configuration
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
+    instances:
+      user-service:
+        timeoutDuration: 3s
+      product-service:
+        timeoutDuration: 3s
+   # retry configuration if service fails
+  retry:
+    instances:
+      user-service:
+        maxAttempts: 3
+        waitDuration: 1000ms
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.util.concurrent.TimeoutException
+      product-service:
+        maxAttempts: 3
+        waitDuration: 1000ms
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.util.concurrent.TimeoutException
 
-resilience4j.retry:
-  instances:
-    user-service:
-      maxAttempts: 3
-      waitDuration: 1000ms
+  ratelimiter:
+    instances:
+      user-service:
+        limitForPeriod: 2
+        limitRefreshPeriod: 10s
+        timeoutDuration: 3s
+
+logging:
+  level:
+    io.github.resilience4j.circuitbreaker: DEBUG
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.timelimiter: DEBUG
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.client: DEBUG
 
 
 

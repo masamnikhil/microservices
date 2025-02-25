@@ -36,11 +36,6 @@ public class JWTService {
         return claimsResolver.apply(claims);
     }
 
-    /*public String generateToken(UserDetails userDetails){
-
-        return generateToken(userDetails);
-    }*/
-
     public String generateToken(UserDetails userDetails){
 
         List<String> roles = userDetails.getAuthorities().stream().map(role -> new SimpleGrantedAuthority(role.toString()).getAuthority()).collect(Collectors.toList());

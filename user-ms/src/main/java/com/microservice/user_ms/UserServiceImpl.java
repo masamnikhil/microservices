@@ -1,9 +1,11 @@
 package com.microservice.user_ms;
 
 import com.microservice.user_ms.config.JWTService;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,25 +34,27 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Override
     @Transactional
-    @Retry(name = "user-service", fallbackMethod = "fallBackResponse")
     public boolean createUser(UserRequest user) {
-        Optional<User> u = userRepository.findByUsername(user.getUsername());
-        if(u.isPresent())
+        Optional<User> userExist = userRepository.findByUsername(user.getUsername());
+        if(userExist.isPresent())
             return false;
         Set<Role> roles = user.getRoles().stream().map(role ->
             Role.valueOf(role.toUpperCase())
         ).collect(Collectors.toSet());
-        User user1 = User.builder().name(user.getName()).email(user.getEmail())
-                .username(user.getUsername()).password(passwordEncoder.encode(user.getPassword())).roles(roles)
-                        .build();
+            User user1 = User.builder().name(user.getName()).email(user.getEmail())
+                .username(user.getUsername()).password(passwordEncoder.encode(user.getPassword())).createdBy(user.getUsername())
+                    .lastModifiedBy(user.getUsername()).roles(roles).build();
         userRepository.save(user1);
         return true;
     }
 
-    private String fallBackResponse(Exception ex){
-        return ex.getMessage();
+    public boolean fallBackResponse(UserRequest user, Throwable ex){
+        logger.trace("fallback executed");
+        return false;
     }
 
     @Override
@@ -82,6 +86,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Cacheable(value = "users", key = "#username")
     public User getUserbyUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isPresent()){

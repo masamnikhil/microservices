@@ -18,9 +18,6 @@ public interface ProductService {
     @Transactional
     public void updateProductRating(ReviewMessage reviewMessage);
 
-<<<<<<< HEAD
-=======
     public List<Product> getAllProducts(String order, String price, String name);
 
->>>>>>> 6b6ee8c (sorting added)
 }

@@ -1,7 +1,10 @@
 package com.microservice.user_ms;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +35,8 @@ class User extends UserAuditing implements UserDetails{
     private  String password;
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+    protected String createdBy;
+    protected  String lastModifiedBy;
 
 
     @Override
@@ -69,4 +74,5 @@ class User extends UserAuditing implements UserDetails{
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }

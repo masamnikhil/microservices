@@ -12,11 +12,7 @@ import java.util.ArrayList;
 @Data
 @Entity
 @Table(name = "products")
-<<<<<<< HEAD
-class Product {
-=======
 public class Product {
->>>>>>> 6b6ee8c (sorting added)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
